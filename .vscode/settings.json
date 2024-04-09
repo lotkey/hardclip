@@ -1,5 +1,16 @@
 {
     "cSpell.words": [
         "juce"
-    ]
+    ],
+    "files.associations": {
+        "bitset": "cpp",
+        "deque": "cpp",
+        "iterator": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "queue": "cpp",
+        "set": "cpp",
+        "vector": "cpp",
+        "xtree": "cpp"
+    }
 }

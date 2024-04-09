@@ -44,7 +44,11 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
 
     for (int j = 0; j < buffer.getNumSamples(); j++) {
       auto value = channelRead[j];
-      channelWrite[j] = value == 0 ? 0 : value > 0 ? 1 : -1;
+      channelWrite[j] = value == 0  ? 0
+                        : value > 0 ? (m_percentWet / 100.f)
+                                    : -(m_percentWet / 100.f);
+      channelWrite[j] += value * (1.0 - (m_percentWet / 100.f));
+      channelWrite[j] *= m_linearVolumeScale;
     }
   }
 }
@@ -67,6 +71,14 @@ void AudioPluginAudioProcessor::setStateInformation(const void *data,
   // block, whose contents will have been created by the getStateInformation()
   // call.
   juce::ignoreUnused(data, sizeInBytes);
+}
+
+void AudioPluginAudioProcessor::setWetMix(int percent) {
+  m_percentWet = percent;
+}
+
+void AudioPluginAudioProcessor::setLinearVolumeScale(float value) {
+  m_linearVolumeScale = value;
 }
 
 // This creates new instances of the plugin.

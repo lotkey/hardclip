@@ -2,6 +2,10 @@
 
 #include "JuceHeader.hpp"
 
+#include <atomic>
+
+class AudioPluginAudioProcessorEditor;
+
 //==============================================================================
 class AudioPluginAudioProcessor : public juce::AudioProcessor {
 public:
@@ -43,6 +47,14 @@ public:
   void setStateInformation(const void *data, int sizeInBytes) override;
 
 private:
+  friend class AudioPluginAudioProcessorEditor;
+
+  std::atomic<int> m_percentWet = 100;
+  std::atomic<float> m_linearVolumeScale = 1;
+
+  void setWetMix(int percent);
+  void setLinearVolumeScale(float value);
+
   //==============================================================================
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };
