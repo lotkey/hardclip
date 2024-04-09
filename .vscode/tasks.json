@@ -1,0 +1,36 @@
+{
+    "version": "2.0.0",
+    "type": "shell",
+    "tasks": [
+        {
+            "label": "Create Build Directory",
+            "command": "if (!(Test-Path build)) { mkdir build }",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "CMake Configure Build",
+            "command": "cmake -S . -B build",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn": [
+                "Create Build Directory"
+            ]
+        },
+        {
+            "label": "CMake Build",
+            "command": "cmake --build build",
+            "dependsOn": [
+                "CMake Configure Build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        }
+    ]
+}
