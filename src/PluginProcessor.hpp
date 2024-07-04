@@ -41,7 +41,7 @@ public:
 private:
   friend class HardClipEditor;
 
-  juce::AudioProcessorValueTreeState m_state;
+  juce::AudioProcessorValueTreeState m_params;
   std::reference_wrapper<std::atomic<float>> m_percentWet;
   std::reference_wrapper<std::atomic<float>> m_linearVolumeScale;
 

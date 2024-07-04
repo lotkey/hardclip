@@ -3,19 +3,16 @@
 
 //==============================================================================
 HardClipProcessor::HardClipProcessor()
-    : AudioProcessor(
-          BusesProperties()
-              .withInput("Input", juce::AudioChannelSet::stereo(), true)
-              .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
-      m_state(*this, nullptr, juce::Identifier("Hard Clip"),
+    : AudioProcessor(),
+      m_params(*this, nullptr, juce::Identifier("Hard Clip"),
               {std::make_unique<juce::AudioParameterFloat>(
                    "wetMix", "Wet Mix",
                    juce::NormalisableRange<float>(0, 100, 1), 100),
                std::make_unique<juce::AudioParameterFloat>(
                    "volume", "Volume",
                    juce::NormalisableRange<float>(0, 100, 1), 15)}),
-      m_percentWet(*m_state.getRawParameterValue("wetMix")),
-      m_linearVolumeScale(*m_state.getRawParameterValue("volume")) {
+      m_percentWet(*m_params.getRawParameterValue("wetMix")),
+      m_linearVolumeScale(*m_params.getRawParameterValue("volume")) {
   m_percentWet.get().store(100);
   m_linearVolumeScale.get().store(15);
 }
@@ -44,11 +41,11 @@ void HardClipProcessor::processBlock(juce::AudioBuffer<float> &buffer,
 }
 
 juce::AudioProcessorEditor *HardClipProcessor::createEditor() {
-  return new HardClipEditor(*this, m_state);
+  return new HardClipEditor(*this, m_params);
 }
 
 void HardClipProcessor::getStateInformation(juce::MemoryBlock &destData) {
-  auto state = m_state.copyState();
+  auto state = m_params.copyState();
   auto xml = state.createXml();
   copyXmlToBinary(*xml, destData);
 }
@@ -57,8 +54,8 @@ void HardClipProcessor::setStateInformation(const void *data, int sizeInBytes) {
   auto xmlState = getXmlFromBinary(data, sizeInBytes);
 
   if (xmlState.get() != nullptr &&
-      xmlState->hasTagName(m_state.state.getType())) {
-    m_state.replaceState(juce::ValueTree::fromXml(*xmlState));
+      xmlState->hasTagName(m_params.state.getType())) {
+    m_params.replaceState(juce::ValueTree::fromXml(*xmlState));
   }
 }
 
