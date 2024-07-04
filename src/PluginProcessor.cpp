@@ -6,7 +6,19 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
     : AudioProcessor(
           BusesProperties()
               .withInput("Input", juce::AudioChannelSet::stereo(), true)
-              .withOutput("Output", juce::AudioChannelSet::stereo(), true)) {}
+              .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
+      m_state(*this, nullptr, juce::Identifier("Hard Clip"),
+              {std::make_unique<juce::AudioParameterFloat>(
+                   "wetMix", "Wet Mix",
+                   juce::NormalisableRange<float>(0, 100, 1), 100),
+               std::make_unique<juce::AudioParameterFloat>(
+                   "volume", "Volume",
+                   juce::NormalisableRange<float>(0, 100, 1), 15)}),
+      m_percentWet(*m_state.getRawParameterValue("wetMix")),
+      m_linearVolumeScale(*m_state.getRawParameterValue("volume")) {
+  m_percentWet.get().store(100);
+  m_linearVolumeScale.get().store(15);
+}
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor() {}
 
@@ -38,6 +50,9 @@ bool AudioPluginAudioProcessor::isBusesLayoutSupported(
 
 void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
                                              juce::MidiBuffer &) {
+  auto percentWet = m_percentWet.get().load();
+  auto linearVolumeScale = m_linearVolumeScale.get().load() / 100;
+
   for (int i = 0; i < buffer.getNumChannels(); i++) {
     auto *channelRead = buffer.getReadPointer(i);
     auto *channelWrite = buffer.getWritePointer(i);
@@ -45,28 +60,34 @@ void AudioPluginAudioProcessor::processBlock(juce::AudioBuffer<float> &buffer,
     for (int j = 0; j < buffer.getNumSamples(); j++) {
       auto value = channelRead[j];
       channelWrite[j] = value == 0  ? 0
-                        : value > 0 ? (m_percentWet / 100.f)
-                                    : -(m_percentWet / 100.f);
-      channelWrite[j] += value * (1.0 - (m_percentWet / 100.f));
-      channelWrite[j] *= m_linearVolumeScale;
+                        : value > 0 ? (percentWet / 100.f)
+                                    : -(percentWet / 100.f);
+      channelWrite[j] += value * (1.0 - (percentWet / 100.f));
+      channelWrite[j] *= linearVolumeScale;
     }
   }
 }
 
 juce::AudioProcessorEditor *AudioPluginAudioProcessor::createEditor() {
-  return new AudioPluginAudioProcessorEditor(*this);
+  return new AudioPluginAudioProcessorEditor(*this, m_state);
 }
 
 void AudioPluginAudioProcessor::getStateInformation(
     juce::MemoryBlock &destData) {
-  // You should use this method to store your parameters in the memory block.
-  // You could do that either as raw data, or use the XML or ValueTree classes
-  // as intermediaries to make it easy to save and load complex data.
-  juce::ignoreUnused(destData);
+  auto state = m_state.copyState();
+  auto xml = state.createXml();
+  copyXmlToBinary(*xml, destData);
 }
 
 void AudioPluginAudioProcessor::setStateInformation(const void *data,
                                                     int sizeInBytes) {
+  auto xmlState = getXmlFromBinary(data, sizeInBytes);
+
+  if (xmlState.get() != nullptr) {
+    if (xmlState->hasTagName(m_state.state.getType())) {
+      m_state.replaceState(juce::ValueTree::fromXml(*xmlState));
+    }
+  }
   // You should use this method to restore your parameters from this memory
   // block, whose contents will have been created by the getStateInformation()
   // call.
@@ -74,11 +95,11 @@ void AudioPluginAudioProcessor::setStateInformation(const void *data,
 }
 
 void AudioPluginAudioProcessor::setWetMix(int percent) {
-  m_percentWet = percent;
+  // m_percentWet = percent;
 }
 
 void AudioPluginAudioProcessor::setLinearVolumeScale(float value) {
-  m_linearVolumeScale = value;
+  // m_linearVolumeScale = value;
 }
 
 // This creates new instances of the plugin.

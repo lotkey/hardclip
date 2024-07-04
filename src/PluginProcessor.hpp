@@ -49,8 +49,9 @@ public:
 private:
   friend class AudioPluginAudioProcessorEditor;
 
-  std::atomic<int> m_percentWet = 100;
-  std::atomic<float> m_linearVolumeScale = 1;
+  juce::AudioProcessorValueTreeState m_state;
+  std::reference_wrapper<std::atomic<float>> m_percentWet;
+  std::reference_wrapper<std::atomic<float>> m_linearVolumeScale;
 
   void setWetMix(int percent);
   void setLinearVolumeScale(float value);

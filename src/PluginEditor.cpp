@@ -3,39 +3,31 @@
 
 //==============================================================================
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
-    AudioPluginAudioProcessor &p)
-    : AudioProcessorEditor(&p), m_processor(p), m_wetSlider("Wet Mix"),
-      m_volumeSlider("Volume"), m_wetLabel("percent label", "Wet/Dry Mix"),
-      m_volumeLabel("volume label", "Volume") {
-
-  startTimer(20);
+    juce::AudioProcessor &processor, juce::AudioProcessorValueTreeState &state)
+    : AudioProcessorEditor(processor), m_valueTreeState(state) {
+  m_wetLabel.setText("Wet/Dry Mix", juce::dontSendNotification);
+  m_wetLabel.attachToComponent(&m_wetSlider, juce::dontSendNotification);
+  addAndMakeVisible(m_wetLabel);
+  m_volumeLabel.setText("Volume", juce::dontSendNotification);
+  m_volumeLabel.attachToComponent(&m_volumeSlider, juce::dontSendNotification);
+  addAndMakeVisible(m_volumeLabel);
 
   m_wetSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
   m_wetSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 75, 25);
   m_wetSlider.setTextValueSuffix("%");
-  m_wetSlider.setRange(0, 100, 1);
-  m_wetSlider.setValue(100);
   m_wetSlider.setBounds(0, 25, 200, 200);
-  m_wetSlider.addListener(this);
   addAndMakeVisible(m_wetSlider);
-
-  m_wetLabel.attachToComponent(&m_wetSlider, false);
-  addAndMakeVisible(m_wetLabel);
+  m_wetAttachment.reset(
+      new SliderAttachment(m_valueTreeState, "wetMix", m_wetSlider));
 
   m_volumeSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
   m_volumeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 75, 25);
   m_volumeSlider.setTextValueSuffix("%");
   m_volumeSlider.setBounds(200, 25, 200, 200);
-  m_volumeSlider.setRange(0, 100, 1);
-  m_volumeSlider.setValue(15);
-  m_volumeSlider.addListener(this);
   addAndMakeVisible(m_volumeSlider);
+  m_volumeAttachment.reset(
+      new SliderAttachment(m_valueTreeState, "volume", m_volumeSlider));
 
-  m_volumeLabel.attachToComponent(&m_volumeSlider, false);
-  addAndMakeVisible(m_volumeLabel);
-
-  // Make sure that before the constructor has finished, you've set the
-  // editor's size to whatever you need it to be.
   setSize(400, 250);
 }
 
@@ -55,12 +47,4 @@ void AudioPluginAudioProcessorEditor::paint(juce::Graphics &g) {
 void AudioPluginAudioProcessorEditor::resized() {
   // This is generally where you'll want to lay out the positions of any
   // subcomponents in your editor..
-}
-
-void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
-  if (slider == &m_wetSlider) {
-    m_processor.get().setWetMix(m_wetSlider.getValue());
-  } else if (slider == &m_volumeSlider) {
-    m_processor.get().setLinearVolumeScale(m_volumeSlider.getValue() / 100.f);
-  }
 }
