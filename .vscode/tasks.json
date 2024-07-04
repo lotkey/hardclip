@@ -3,6 +3,14 @@
     "type": "shell",
     "tasks": [
         {
+            "label": "Update Submodules",
+            "command": "git submodules update --init",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "Create Build Directory",
             "command": "if (!(Test-Path build)) { mkdir build }",
             "group": {
@@ -25,18 +33,8 @@
             "label": "CMake Build",
             "command": "cmake --build build",
             "dependsOn": [
-                "CMake Configure Build"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
-            "label": "Install VST",
-            "command": "cp 'build/hardclip_artefacts/Debug/VST3/Hard Clip.vst3/Contents/x86_64-win/Hard Clip.vst3' 'C:/Program Files/Common Files/VST3/Hard Clip.vst3'",
-            "dependsOn": [
-                "CMake Build"
+                "CMake Configure Build",
+                "Update Submodules"
             ],
             "group": {
                 "kind": "build",
