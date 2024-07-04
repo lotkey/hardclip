@@ -24,7 +24,7 @@ private:
   // access the processor object that created it.
   std::reference_wrapper<AudioPluginAudioProcessor> m_processor;
   juce::Slider m_wetSlider;
-  lk::DecibelSlider m_volumeSlider;
+  juce::Slider m_volumeSlider;
   juce::Label m_wetLabel;
   juce::Label m_volumeLabel;
 

@@ -25,6 +25,8 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(
   m_volumeSlider.setSliderStyle(juce::Slider::SliderStyle::Rotary);
   m_volumeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 75, 25);
   m_volumeSlider.setBounds(200, 25, 200, 200);
+  m_volumeSlider.setRange(0, 1, 0.1f);
+  m_volumeSlider.setValue(0.25);
   m_volumeSlider.addListener(this);
   addAndMakeVisible(m_volumeSlider);
 
@@ -58,6 +60,6 @@ void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider *slider) {
   if (slider == &m_wetSlider) {
     m_processor.get().setWetMix(m_wetSlider.getValue());
   } else if (slider == &m_volumeSlider) {
-    m_processor.get().setLinearVolumeScale(m_volumeSlider.linearGain());
+    m_processor.get().setLinearVolumeScale(m_volumeSlider.getValue());
   }
 }
