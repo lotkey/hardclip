@@ -31,6 +31,17 @@
                 "kind": "build",
                 "isDefault": false
             }
+        },
+        {
+            "label": "Install VST",
+            "command": "cp 'build/hardclip_artefacts/Debug/VST3/Hard Clip.vst3/Contents/x86_64-win/Hard Clip.vst3' 'C:/Program Files/Common Files/VST3/Hard Clip.vst3'",
+            "dependsOn": [
+                "CMake Build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
         }
     ]
 }
