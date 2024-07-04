@@ -4,16 +4,14 @@
 
 #include <functional>
 
-//==============================================================================
-class AudioPluginAudioProcessorEditor : public juce::AudioProcessorEditor {
+class HardClipEditor : public juce::AudioProcessorEditor {
 public:
   using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
 
-  AudioPluginAudioProcessorEditor(juce::AudioProcessor &processor,
-                                  juce::AudioProcessorValueTreeState &state);
-  ~AudioPluginAudioProcessorEditor() override;
+  HardClipEditor(juce::AudioProcessor &processor,
+                 juce::AudioProcessorValueTreeState &state);
+  ~HardClipEditor() override;
 
-  //==============================================================================
   void paint(juce::Graphics &) override;
   void resized() override;
 
@@ -23,6 +21,6 @@ private:
   juce::Slider m_volumeSlider;
   juce::Label m_wetLabel;
   juce::Label m_volumeLabel;
-  std::unique_ptr<SliderAttachment> m_wetAttachment;
-  std::unique_ptr<SliderAttachment> m_volumeAttachment;
+  SliderAttachment m_wetAttachment;
+  SliderAttachment m_volumeAttachment;
 };
