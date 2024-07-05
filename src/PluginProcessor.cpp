@@ -1,16 +1,15 @@
 #include "PluginProcessor.hpp"
 #include "PluginEditor.hpp"
 
-//==============================================================================
 HardClipProcessor::HardClipProcessor()
     : AudioProcessor(),
       m_params(*this, nullptr, juce::Identifier("Hard Clip"),
-              {std::make_unique<juce::AudioParameterFloat>(
-                   "wetMix", "Wet Mix",
-                   juce::NormalisableRange<float>(0, 100, 1), 100),
-               std::make_unique<juce::AudioParameterFloat>(
-                   "volume", "Volume",
-                   juce::NormalisableRange<float>(0, 100, 1), 15)}),
+               {std::make_unique<juce::AudioParameterFloat>(
+                    "wetMix", "Wet Mix",
+                    juce::NormalisableRange<float>(0, 100, 1), 100),
+                std::make_unique<juce::AudioParameterFloat>(
+                    "volume", "Volume",
+                    juce::NormalisableRange<float>(0, 100, 1), 15)}),
       m_percentWet(*m_params.getRawParameterValue("wetMix")),
       m_linearVolumeScale(*m_params.getRawParameterValue("volume")) {
   m_percentWet.get().store(100);
