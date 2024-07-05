@@ -4,7 +4,7 @@
     "tasks": [
         {
             "label": "Update Submodules",
-            "command": "git submodules update --init",
+            "command": "git submodule update --init",
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -20,7 +20,7 @@
         },
         {
             "label": "CMake Configure Build",
-            "command": "cmake -S . -B build",
+            "command": "cmake -S . -B build -A x64",
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -31,7 +31,7 @@
         },
         {
             "label": "CMake Build",
-            "command": "cmake --build build",
+            "command": "cmake --build build --config Release",
             "dependsOn": [
                 "CMake Configure Build",
                 "Update Submodules"
