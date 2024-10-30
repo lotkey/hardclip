@@ -7,6 +7,13 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(${JUCE})
 
+set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_PROCESSOR x86_64)
+set(CMAKE_C_COMPILER /usr/bin/x86_64-w64-mingw32-gcc)
+set(CMAKE_CXX_COMPILER /usr/bin/x86_64-w64-mingw32-g++)
+find_package(Threads REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20 -static-libgcc -static-libstdc++")
+
 juce_add_plugin(hardclip
     FORMATS Standalone VST3
     PRODUCT_NAME "Hard Clip"
@@ -32,6 +39,10 @@ juce_add_plugin(hardclip
                                                 # Stereo, Surround, Synth, Tools, Up-Downmix
 )
 
+# # Target for cross-compilation on Windows
+# if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+# endif()
+
 target_include_directories(hardclip PUBLIC
     ${JUCE}/modules
 )
@@ -50,11 +61,17 @@ target_compile_definitions(hardclip
         JUCE_DISPLAY_SPLASH_SCREEN=0 # since we're licensed under GPLv3 we can remove the splash screen!
 )
 
-target_link_libraries(hardclip
-    PRIVATE
-        juce::juce_audio_utils
-    PUBLIC
-        juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags
+target_link_libraries(hardclip PRIVATE
+    juce::juce_audio_utils
+    juce::juce_audio_basics
+    juce::juce_audio_processors
+    juce::juce_audio_formats
+    juce::juce_core
+    juce::juce_gui_basics
+    juce::juce_gui_extra
+PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags
+    -lwinmm -lole32 -luuid -loleaut32 -luuid -lgdi32
 )
